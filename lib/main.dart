@@ -15,6 +15,9 @@ class _MyAppState extends State<MyApp> {
   double _horizontalDivision = 1.0;
   double _verticalDivision = 1.0;
 
+  // Set untuk melacak kotak yang dipilih
+  final Set<Offset> _selectedBoxes = {};
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -51,6 +54,7 @@ class _MyAppState extends State<MyApp> {
                       onChanged: (newDivision) {
                         setState(() {
                           _verticalDivision = newDivision;
+                          _selectedBoxes.clear(); // Reset saat slider berubah
                         });
                       },
                     ),
@@ -65,14 +69,20 @@ class _MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CustomPaint(
-                  size: const Size(280, 280),
-                  painter: RectPainter(
+                GestureDetector(
+                  onTapDown: (details) {
+                    _handleTap(details.localPosition);
+                  },
+                  child: CustomPaint(
+                    size: const Size(280, 280),
+                    painter: RectPainter(
                       horizontalDivision: _horizontalDivision,
-                      verticalDivision: _verticalDivision),
+                      verticalDivision: _verticalDivision,
+                      selectedBoxes: _selectedBoxes,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
-                // Slider untuk mengubah nilai pembagian kotak
                 SizedBox(
                   width: 280,
                   child: Slider(
@@ -82,16 +92,21 @@ class _MyAppState extends State<MyApp> {
                     value: _horizontalDivision,
                     min: 1,
                     max: 10,
-                    divisions:
-                        9, // Slider terbagi ke dalam 9 langkah (1 hingga 10)
+                    divisions: 9,
                     label: _horizontalDivision.toStringAsFixed(0),
                     onChanged: (newDivision) {
                       setState(() {
-                        _horizontalDivision =
-                            newDivision; // Ubah nilai sesuai dengan slider
+                        _horizontalDivision = newDivision;
+                        _selectedBoxes.clear(); // Reset saat slider berubah
                       });
                     },
                   ),
+                ),
+                const SizedBox(height: 20),
+                // Menampilkan jumlah kotak yang dipilih
+                Text(
+                  'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
+                  style: const TextStyle(color: Colors.white),
                 ),
               ],
             ),
@@ -103,14 +118,38 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
+  void _handleTap(Offset position) {
+    final double boxWidth = 280 / _horizontalDivision;
+    final double boxHeight = 280 / _verticalDivision;
+
+    // Hitung kotak mana yang dipilih berdasarkan posisi klik
+    final int xIndex = (position.dx ~/ boxWidth);
+    final int yIndex = (position.dy ~/ boxHeight);
+
+    final selectedBox = Offset(xIndex.toDouble(), yIndex.toDouble());
+
+    setState(() {
+      // Toggle kotak apakah dipilih atau dihapus dari set
+      if (_selectedBoxes.contains(selectedBox)) {
+        _selectedBoxes.remove(selectedBox);
+      } else {
+        _selectedBoxes.add(selectedBox);
+      }
+    });
+  }
 }
 
 class RectPainter extends CustomPainter {
   final double horizontalDivision;
   final double verticalDivision;
+  final Set<Offset> selectedBoxes;
 
-  RectPainter(
-      {required this.horizontalDivision, required this.verticalDivision});
+  RectPainter({
+    required this.horizontalDivision,
+    required this.verticalDivision,
+    required this.selectedBoxes,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -124,57 +163,45 @@ class RectPainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..strokeWidth = 2.0;
 
-    final double boxWidth = size.width;
-    final double boxHeight = size.height;
+    final selectedPaint = Paint()
+      ..color = const Color(0xff1C858B)
+      ..style = PaintingStyle.fill;
+
+    final double boxWidth = size.width / horizontalDivision;
+    final double boxHeight = size.height / verticalDivision;
 
     // Gambar kotak utama
-    final rect = Rect.fromLTWH(0, 0, boxWidth, boxHeight);
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     canvas.drawRect(rect, paintRect);
 
     // Gambar garis vertikal sesuai dengan nilai horizontalDivision
-    double divisionWidth = boxWidth / horizontalDivision;
     for (int i = 1; i < horizontalDivision; i++) {
-      canvas.drawLine(Offset(divisionWidth * i, 0),
-          Offset(divisionWidth * i, boxHeight), paint);
+      canvas.drawLine(
+          Offset(boxWidth * i, 0), Offset(boxWidth * i, size.height), paint);
     }
 
     // Gambar garis horizontal sesuai dengan nilai verticalDivision
-    double divisionHeight = boxHeight / verticalDivision;
     for (int i = 1; i < verticalDivision; i++) {
-      canvas.drawLine(Offset(0, divisionHeight * i),
-          Offset(boxWidth, divisionHeight * i), paint);
+      canvas.drawLine(
+          Offset(0, boxHeight * i), Offset(size.width, boxHeight * i), paint);
+    }
+
+    // Gambar kotak yang dipilih
+    for (final box in selectedBoxes) {
+      final rect = Rect.fromLTWH(
+        box.dx * boxWidth,
+        box.dy * boxHeight,
+        boxWidth - 1,
+        boxHeight - 1,
+      );
+      canvas.drawRect(rect, selectedPaint);
     }
   }
 
   @override
   bool shouldRepaint(covariant RectPainter oldDelegate) {
     return oldDelegate.horizontalDivision != horizontalDivision ||
-        oldDelegate.verticalDivision != verticalDivision;
-  }
-}
-
-class CanvasPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.blue // Warna gambar
-      ..strokeWidth = 4.0 // Lebar garis
-      ..style = PaintingStyle.stroke; // Hanya garis tepi, tanpa isi
-
-    // Gambar garis dari titik (50, 50) ke titik (250, 250)
-    canvas.drawLine(const Offset(50, 50), const Offset(50, 180), paint);
-
-    // Gambar persegi panjang
-    const rect = Rect.fromLTWH(50, 100, 200, 100); // x, y, lebar, tinggi
-    canvas.drawRect(rect, paint);
-
-    // Gambar lingkaran
-    canvas.drawCircle(
-        const Offset(150, 250), 50, paint); // Pusat di (150, 250), radius 50
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+        oldDelegate.verticalDivision != verticalDivision ||
+        oldDelegate.selectedBoxes != selectedBoxes;
   }
 }
