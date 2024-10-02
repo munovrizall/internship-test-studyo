@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+enum Orientation { vertical, horizontal }
+
 void main() {
   runApp(const MyApp());
 }
@@ -15,7 +17,6 @@ class _MyAppState extends State<MyApp> {
   double _horizontalDivision = 1.0;
   double _verticalDivision = 1.0;
 
-  // Set untuk melacak kotak yang dipilih
   final Set<Offset> _selectedBoxes = {};
 
   @override
@@ -38,28 +39,7 @@ class _MyAppState extends State<MyApp> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  height: 280,
-                  child: RotatedBox(
-                    quarterTurns: 1,
-                    child: Slider(
-                      thumbColor: const Color(0xff1C858B),
-                      activeColor: const Color(0xff1C858B),
-                      inactiveColor: const Color(0xff363636),
-                      value: _verticalDivision,
-                      min: 1,
-                      max: 10,
-                      divisions: 9,
-                      label: _verticalDivision.toStringAsFixed(0),
-                      onChanged: (newDivision) {
-                        setState(() {
-                          _verticalDivision = newDivision;
-                          _selectedBoxes.clear(); // Reset saat slider berubah
-                        });
-                      },
-                    ),
-                  ),
-                ),
+                sliderWidget(Orientation.vertical),
                 const SizedBox(
                   height: 60,
                 ),
@@ -69,6 +49,7 @@ class _MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                sliderWidget(Orientation.horizontal),
                 GestureDetector(
                   onTapDown: (details) {
                     _handleTap(details.localPosition);
@@ -82,26 +63,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: 280,
-                  child: Slider(
-                    thumbColor: const Color(0xff1C858B),
-                    activeColor: const Color(0xff1C858B),
-                    inactiveColor: const Color(0xff363636),
-                    value: _horizontalDivision,
-                    min: 1,
-                    max: 10,
-                    divisions: 9,
-                    label: _horizontalDivision.toStringAsFixed(0),
-                    onChanged: (newDivision) {
-                      setState(() {
-                        _horizontalDivision = newDivision;
-                        _selectedBoxes.clear(); // Reset saat slider berubah
-                      });
-                    },
-                  ),
-                ),
+                sliderWidget(Orientation.horizontal),
                 const SizedBox(height: 20),
                 // Menampilkan jumlah kotak yang dipilih
                 Text(
@@ -110,13 +72,66 @@ class _MyAppState extends State<MyApp> {
                 ),
               ],
             ),
-            const SizedBox(
-              width: 48,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                sliderWidget(Orientation.vertical),
+                const SizedBox(
+                  height: 60,
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  SizedBox sliderWidget(Orientation orientation) {
+    if (orientation == Orientation.vertical) {
+      return SizedBox(
+        height: 280,
+        child: RotatedBox(
+          quarterTurns: 1,
+          child: Slider(
+            thumbColor: const Color(0xff1C858B),
+            activeColor: const Color(0xff1C858B),
+            inactiveColor: const Color(0xff363636),
+            value: _verticalDivision,
+            min: 1,
+            max: 10,
+            divisions: 9,
+            label: _verticalDivision.toStringAsFixed(0),
+            onChanged: (newDivision) {
+              setState(() {
+                _verticalDivision = newDivision;
+                _selectedBoxes.clear();
+              });
+            },
+          ),
+        ),
+      );
+    } else {
+      return SizedBox(
+        width: 280,
+        child: Slider(
+          thumbColor: const Color(0xff1C858B),
+          activeColor: const Color(0xff1C858B),
+          inactiveColor: const Color(0xff363636),
+          value: _horizontalDivision,
+          min: 1,
+          max: 10,
+          divisions: 9,
+          label: _horizontalDivision.toStringAsFixed(0),
+          onChanged: (newDivision) {
+            setState(() {
+              _horizontalDivision = newDivision;
+              _selectedBoxes.clear();
+            });
+          },
+        ),
+      );
+    }
   }
 
   void _handleTap(Offset position) {
