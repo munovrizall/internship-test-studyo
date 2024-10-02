@@ -62,10 +62,14 @@ class _MyAppState extends State<MyApp> {
                 ),
                 sliderWidget(Orientation.horizontal),
                 const SizedBox(height: 20),
-                // Text(
-                //   'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
-                //   style: const TextStyle(color: Colors.white),
-                // ),
+                Opacity(
+                  opacity: 0,
+                  child: Text(
+                    'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
+                    style: const TextStyle(color: Colors.white),
+                  
+                  ),
+                ),
                 SizedBox(
                   width: 200,
                   child: FilledButton(
