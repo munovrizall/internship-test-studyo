@@ -29,9 +29,6 @@ class _MyAppState extends State<MyApp> {
       ),
       home: Scaffold(
         backgroundColor: const Color(0xff363636),
-        appBar: AppBar(
-          title: const Text('Flutter Canvas'),
-        ),
         body: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -65,10 +62,22 @@ class _MyAppState extends State<MyApp> {
                 ),
                 sliderWidget(Orientation.horizontal),
                 const SizedBox(height: 20),
-                // Menampilkan jumlah kotak yang dipilih
-                Text(
-                  'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
-                  style: const TextStyle(color: Colors.white),
+                // Text(
+                //   'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
+                //   style: const TextStyle(color: Colors.white),
+                // ),
+                SizedBox(
+                  width: 200,
+                  child: FilledButton(
+                    onPressed: () {},
+                    style: const ButtonStyle(
+                        backgroundColor:
+                            WidgetStatePropertyAll(Color(0xff0000000))),
+                    child: Image.asset(
+                      'images/ic_check.png',
+                      height: 32,
+                    ),
+                  ),
                 ),
               ],
             ),
