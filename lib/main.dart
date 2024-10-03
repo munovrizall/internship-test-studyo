@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 enum Orientation { vertical, horizontal }
@@ -19,6 +21,15 @@ class _MyAppState extends State<MyApp> {
 
   final Set<Offset> _selectedBoxes = {};
 
+  int _numerator = 1;
+  int _denominator = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _generateNewQuestion();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,6 +39,44 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 44, 44, 44),
+          title: Row( 
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.refresh_rounded,
+                      size: 32,
+                      color: Color.fromARGB(255, 158, 158, 158),
+                    ),
+                    onPressed: () {
+                      _generateNewQuestion();
+                    },
+                  ),
+                ],
+              ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.star,
+                    size: 36,
+                    color: Color.fromARGB(255, 16, 197, 43),
+                  ),
+                  Icon(
+                    Icons.star,
+                    size: 36,
+                    color: Color.fromARGB(255, 16, 197, 43),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 48,),
+            ],
+          ),
+        ),
         backgroundColor: const Color(0xff363636),
         body: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -46,6 +95,10 @@ class _MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                Text(
+                  '$_numerator / $_denominator',
+                  style: const TextStyle(color: Colors.white, fontSize: 36),
+                ),
                 sliderWidget(Orientation.horizontal),
                 GestureDetector(
                   onTapDown: (details) {
@@ -62,24 +115,27 @@ class _MyAppState extends State<MyApp> {
                 ),
                 sliderWidget(Orientation.horizontal),
                 const SizedBox(height: 20),
+                // Hiding this text, because the selectedbox state won't be updated if i remove this text
                 Opacity(
                   opacity: 0,
                   child: Text(
                     'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
                     style: const TextStyle(color: Colors.white),
-                  
                   ),
                 ),
                 SizedBox(
                   width: 200,
                   child: FilledButton(
-                    onPressed: () {},
+                    onPressed: _checkAnswer,
                     style: const ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(Color(0xff0000000))),
-                    child: Image.asset(
-                      'images/ic_check.png',
-                      height: 32,
+                      backgroundColor: WidgetStatePropertyAll(
+                        Color.fromARGB(255, 44, 44, 44),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      size: 32,
+                      color: Color.fromARGB(255, 16, 197, 43),
                     ),
                   ),
                 ),
@@ -165,6 +221,41 @@ class _MyAppState extends State<MyApp> {
         _selectedBoxes.add(selectedBox);
       }
     });
+  }
+
+  void _generateNewQuestion() {
+    List<int> possibilities = [];
+
+    for (int i = 1; i <= 10; i++) {
+      for (int j = 1; j <= 10; j++) {
+        possibilities.add(i * j);
+      }
+    }
+    possibilities = possibilities.toSet().toList();
+
+    int randomDenominator =
+        possibilities[Random().nextInt(possibilities.length)];
+
+    int randomNumerator;
+
+    do {
+      randomNumerator = Random().nextInt(99) + 2;
+    } while (randomNumerator >= randomDenominator);
+
+    setState(() {
+      _denominator = randomDenominator;
+      _numerator = randomNumerator;
+    });
+  }
+
+  void _checkAnswer() {
+    if (_selectedBoxes.length == _numerator) {
+      print('benar');
+      _generateNewQuestion();
+    } else {
+      print('salah');
+      _generateNewQuestion();
+    }
   }
 }
 
