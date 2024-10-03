@@ -1,15 +1,13 @@
 import 'dart:math';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
+import 'package:internship_test_studyo/utils/constants.dart';
+import 'package:internship_test_studyo/widgets/rect_painter.dart';
 
 enum Orientation { vertical, horizontal }
 
 void main() {
-  runApp(
-    const MaterialApp( 
-      home: MyApp() 
-    )
-  );
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -28,9 +26,8 @@ class _MyAppState extends State<MyApp> {
   int _numerator = 1;
   int _denominator = 1;
 
-  int correctAnswer = 0; // Menyimpan jumlah jawaban benar
-  final int _targetCorrectAnswers =
-      5; // Target jawaban benar untuk progress penuh
+  int correctAnswer = 0;
+  final int _targetCorrectAnswers = 5;
   double progress = 0.0;
 
   @override
@@ -52,7 +49,7 @@ class _MyAppState extends State<MyApp> {
       home: Builder(builder: (context) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: const Color.fromARGB(255, 44, 44, 44),
+            backgroundColor: AppColors.darkGrey,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -62,7 +59,7 @@ class _MyAppState extends State<MyApp> {
                       icon: const Icon(
                         Icons.refresh_rounded,
                         size: 32,
-                        color: Color.fromARGB(255, 158, 158, 158),
+                        color: AppColors.grey,
                       ),
                       onPressed: () {
                         _generateNewQuestion();
@@ -76,12 +73,12 @@ class _MyAppState extends State<MyApp> {
                     Icon(
                       Icons.star,
                       size: 36,
-                      color: Color.fromARGB(255, 16, 197, 43),
+                      color: Colors.green,
                     ),
                     Icon(
                       Icons.star,
                       size: 36,
-                      color: Color.fromARGB(255, 16, 197, 43),
+                      color: Colors.green,
                     ),
                   ],
                 ),
@@ -91,14 +88,14 @@ class _MyAppState extends State<MyApp> {
               ],
             ),
           ),
-          backgroundColor: const Color(0xff363636),
+          backgroundColor: AppColors.backgroundColor,
           body: Column(
             children: [
               SizedBox(
                 width: screenWidth,
                 child: LinearProgressIndicator(
                   value: progress, // Nilai progress bar
-                  backgroundColor: Colors.grey[300],
+                  backgroundColor: AppColors.grey,
                   color: Colors.green,
                   minHeight: 10,
                 ),
@@ -176,7 +173,7 @@ class _MyAppState extends State<MyApp> {
                           onPressed: _checkAnswer,
                           style: const ButtonStyle(
                             backgroundColor: WidgetStatePropertyAll(
-                              Color.fromARGB(255, 44, 44, 44),
+                              AppColors.darkGrey,
                             ),
                           ),
                           child: const Icon(
@@ -213,9 +210,9 @@ class _MyAppState extends State<MyApp> {
         child: RotatedBox(
           quarterTurns: 1,
           child: Slider(
-            thumbColor: const Color(0xff1C858B),
-            activeColor: const Color(0xff1C858B),
-            inactiveColor: const Color(0xff363636),
+            thumbColor: AppColors.primaryBlue,
+            activeColor: AppColors.primaryBlue,
+            inactiveColor: AppColors.backgroundColor,
             value: _verticalDivision,
             min: 1,
             max: 10,
@@ -234,8 +231,8 @@ class _MyAppState extends State<MyApp> {
       return SizedBox(
         width: 280,
         child: Slider(
-          thumbColor: const Color(0xff1C858B),
-          activeColor: const Color(0xff1C858B),
+          thumbColor: AppColors.primaryBlue,
+          activeColor: AppColors.primaryBlue,
           inactiveColor: const Color(0xff363636),
           value: _horizontalDivision,
           min: 1,
@@ -257,14 +254,12 @@ class _MyAppState extends State<MyApp> {
     final double boxWidth = 280 / _horizontalDivision;
     final double boxHeight = 280 / _verticalDivision;
 
-    // Hitung kotak mana yang dipilih berdasarkan posisi klik
     final int xIndex = (position.dx ~/ boxWidth);
     final int yIndex = (position.dy ~/ boxHeight);
 
     final selectedBox = Offset(xIndex.toDouble(), yIndex.toDouble());
 
     setState(() {
-      // Toggle kotak apakah dipilih atau dihapus dari set
       if (_selectedBoxes.contains(selectedBox)) {
         _selectedBoxes.remove(selectedBox);
       } else {
@@ -300,14 +295,7 @@ class _MyAppState extends State<MyApp> {
 
   void _checkAnswer() {
     if (_selectedBoxes.length == _numerator) {
-      Fluttertoast.showToast(
-          msg: "Correct answer!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      _showToast("Correct answer!", Colors.green);
       correctAnswer++;
       _updateProgress();
 
@@ -318,14 +306,7 @@ class _MyAppState extends State<MyApp> {
         _selectedBoxes.clear();
       }
     } else {
-      Fluttertoast.showToast(
-          msg: "Wrong answer!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      _showToast("Wrong answer!", Colors.red);
       _generateNewQuestion();
       _selectedBoxes.clear();
     }
@@ -335,6 +316,17 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       progress = correctAnswer / _targetCorrectAnswers;
     });
+  }
+
+  void _showToast(String message, Color backgroundColor) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: backgroundColor,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   void _showCompletionDialog() {
@@ -359,71 +351,5 @@ class _MyAppState extends State<MyApp> {
         ],
       ),
     );
-  }
-}
-
-class RectPainter extends CustomPainter {
-  final double horizontalDivision;
-  final double verticalDivision;
-  final Set<Offset> selectedBoxes;
-
-  RectPainter({
-    required this.horizontalDivision,
-    required this.verticalDivision,
-    required this.selectedBoxes,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xff363636)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    final paintRect = Paint()
-      ..color = const Color(0xff627380)
-      ..style = PaintingStyle.fill
-      ..strokeWidth = 2.0;
-
-    final selectedPaint = Paint()
-      ..color = const Color(0xff1C858B)
-      ..style = PaintingStyle.fill;
-
-    final double boxWidth = size.width / horizontalDivision;
-    final double boxHeight = size.height / verticalDivision;
-
-    // Gambar kotak utama
-    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    canvas.drawRect(rect, paintRect);
-
-    // Gambar garis vertikal sesuai dengan nilai horizontalDivision
-    for (int i = 1; i < horizontalDivision; i++) {
-      canvas.drawLine(
-          Offset(boxWidth * i, 0), Offset(boxWidth * i, size.height), paint);
-    }
-
-    // Gambar garis horizontal sesuai dengan nilai verticalDivision
-    for (int i = 1; i < verticalDivision; i++) {
-      canvas.drawLine(
-          Offset(0, boxHeight * i), Offset(size.width, boxHeight * i), paint);
-    }
-
-    // Gambar kotak yang dipilih
-    for (final box in selectedBoxes) {
-      final rect = Rect.fromLTWH(
-        box.dx * boxWidth,
-        box.dy * boxHeight,
-        boxWidth - 1,
-        boxHeight - 1,
-      );
-      canvas.drawRect(rect, selectedPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant RectPainter oldDelegate) {
-    return oldDelegate.horizontalDivision != horizontalDivision ||
-        oldDelegate.verticalDivision != verticalDivision ||
-        oldDelegate.selectedBoxes != selectedBoxes;
   }
 }
