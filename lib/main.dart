@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 44, 44, 44),
-          title: Row( 
+          title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Row(
@@ -73,7 +73,9 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ],
               ),
-              const SizedBox(width: 48,),
+              const SizedBox(
+                width: 48,
+              ),
             ],
           ),
         ),
@@ -95,9 +97,26 @@ class _MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  '$_numerator / $_denominator',
-                  style: const TextStyle(color: Colors.white, fontSize: 36),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      '$_numerator',
+                      style: const TextStyle(color: Colors.white, fontSize: 36),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                      width: 40,
+                      child: Divider(
+                        color: Colors.white,
+                        thickness: 5,
+                      ),
+                    ),
+                    Text(
+                      '$_denominator',
+                      style: const TextStyle(color: Colors.white, fontSize: 36),
+                    ),
+                  ],
                 ),
                 sliderWidget(Orientation.horizontal),
                 GestureDetector(
@@ -252,9 +271,11 @@ class _MyAppState extends State<MyApp> {
     if (_selectedBoxes.length == _numerator) {
       print('benar');
       _generateNewQuestion();
+      _selectedBoxes.clear();
     } else {
       print('salah');
       _generateNewQuestion();
+      _selectedBoxes.clear();
     }
   }
 }
