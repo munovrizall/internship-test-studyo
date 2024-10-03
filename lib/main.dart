@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 
 enum Orientation { vertical, horizontal }
@@ -269,11 +269,25 @@ class _MyAppState extends State<MyApp> {
 
   void _checkAnswer() {
     if (_selectedBoxes.length == _numerator) {
-      print('benar');
+      Fluttertoast.showToast(
+          msg: "Correct answer!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
       _generateNewQuestion();
       _selectedBoxes.clear();
     } else {
-      print('salah');
+      Fluttertoast.showToast(
+          msg: "Wrong answer!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
       _generateNewQuestion();
       _selectedBoxes.clear();
     }
