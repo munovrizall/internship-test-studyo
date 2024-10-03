@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 enum Orientation { vertical, horizontal }
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const MaterialApp( 
+      home: MyApp() 
+    )
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -45,158 +49,160 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 44, 44, 44),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.refresh_rounded,
-                      size: 32,
-                      color: Color.fromARGB(255, 158, 158, 158),
-                    ),
-                    onPressed: () {
-                      _generateNewQuestion();
-                    },
-                  ),
-                ],
-              ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.star,
-                    size: 36,
-                    color: Color.fromARGB(255, 16, 197, 43),
-                  ),
-                  Icon(
-                    Icons.star,
-                    size: 36,
-                    color: Color.fromARGB(255, 16, 197, 43),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                width: 48,
-              ),
-            ],
-          ),
-        ),
-        backgroundColor: const Color(0xff363636),
-        body: Column(
-          children: [
-            SizedBox(
-              width: screenWidth,
-              child: LinearProgressIndicator(
-                value: progress, // Nilai progress bar
-                backgroundColor: Colors.grey[300],
-                color: Colors.green,
-                minHeight: 10,
-              ),
-            ),
-            const SizedBox(
-              height: 48,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+      home: Builder(builder: (context) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: const Color.fromARGB(255, 44, 44, 44),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Row(
                   children: [
-                    sliderWidget(Orientation.vertical),
-                    const SizedBox(
-                      height: 60,
-                    ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$_numerator',
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 36),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                          width: 40,
-                          child: Divider(
-                            color: Colors.white,
-                            thickness: 5,
-                          ),
-                        ),
-                        Text(
-                          '$_denominator',
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 36),
-                        ),
-                      ],
-                    ),
-                    sliderWidget(Orientation.horizontal),
-                    GestureDetector(
-                      onTapDown: (details) {
-                        _handleTap(details.localPosition);
+                    IconButton(
+                      icon: const Icon(
+                        Icons.refresh_rounded,
+                        size: 32,
+                        color: Color.fromARGB(255, 158, 158, 158),
+                      ),
+                      onPressed: () {
+                        _generateNewQuestion();
                       },
-                      child: CustomPaint(
-                        size: const Size(280, 280),
-                        painter: RectPainter(
-                          horizontalDivision: _horizontalDivision,
-                          verticalDivision: _verticalDivision,
-                          selectedBoxes: _selectedBoxes,
-                        ),
-                      ),
-                    ),
-                    sliderWidget(Orientation.horizontal),
-                    const SizedBox(height: 20),
-                    // Hiding this text, because the selectedbox state won't be updated if i remove this text
-                    Opacity(
-                      opacity: 0,
-                      child: Text(
-                        'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 200,
-                      child: FilledButton(
-                        onPressed: _checkAnswer,
-                        style: const ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(
-                            Color.fromARGB(255, 44, 44, 44),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.check,
-                          size: 32,
-                          color: Color.fromARGB(255, 16, 197, 43),
-                        ),
-                      ),
                     ),
                   ],
                 ),
-                Column(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    sliderWidget(Orientation.vertical),
-                    const SizedBox(
-                      height: 60,
+                    Icon(
+                      Icons.star,
+                      size: 36,
+                      color: Color.fromARGB(255, 16, 197, 43),
+                    ),
+                    Icon(
+                      Icons.star,
+                      size: 36,
+                      color: Color.fromARGB(255, 16, 197, 43),
                     ),
                   ],
+                ),
+                const SizedBox(
+                  width: 48,
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+          backgroundColor: const Color(0xff363636),
+          body: Column(
+            children: [
+              SizedBox(
+                width: screenWidth,
+                child: LinearProgressIndicator(
+                  value: progress, // Nilai progress bar
+                  backgroundColor: Colors.grey[300],
+                  color: Colors.green,
+                  minHeight: 10,
+                ),
+              ),
+              const SizedBox(
+                height: 48,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      sliderWidget(Orientation.vertical),
+                      const SizedBox(
+                        height: 60,
+                      ),
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            '$_numerator',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 36),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                            width: 40,
+                            child: Divider(
+                              color: Colors.white,
+                              thickness: 5,
+                            ),
+                          ),
+                          Text(
+                            '$_denominator',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 36),
+                          ),
+                        ],
+                      ),
+                      sliderWidget(Orientation.horizontal),
+                      GestureDetector(
+                        onTapDown: (details) {
+                          _handleTap(details.localPosition);
+                        },
+                        child: CustomPaint(
+                          size: const Size(280, 280),
+                          painter: RectPainter(
+                            horizontalDivision: _horizontalDivision,
+                            verticalDivision: _verticalDivision,
+                            selectedBoxes: _selectedBoxes,
+                          ),
+                        ),
+                      ),
+                      sliderWidget(Orientation.horizontal),
+                      const SizedBox(height: 20),
+                      // Hiding this text, because the selectedbox state won't be updated if i remove this text
+                      Opacity(
+                        opacity: 0,
+                        child: Text(
+                          'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 200,
+                        child: FilledButton(
+                          onPressed: _checkAnswer,
+                          style: const ButtonStyle(
+                            backgroundColor: WidgetStatePropertyAll(
+                              Color.fromARGB(255, 44, 44, 44),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.check,
+                            size: 32,
+                            color: Color.fromARGB(255, 16, 197, 43),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      sliderWidget(Orientation.vertical),
+                      const SizedBox(
+                        height: 60,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 
@@ -304,8 +310,13 @@ class _MyAppState extends State<MyApp> {
           fontSize: 16.0);
       correctAnswer++;
       _updateProgress();
-      _generateNewQuestion();
-      _selectedBoxes.clear();
+
+      if (correctAnswer == 5) {
+        _showCompletionDialog();
+      } else {
+        _generateNewQuestion();
+        _selectedBoxes.clear();
+      }
     } else {
       Fluttertoast.showToast(
           msg: "Wrong answer!",
@@ -324,6 +335,30 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       progress = correctAnswer / _targetCorrectAnswers;
     });
+  }
+
+  void _showCompletionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Congratulations!'),
+        content: const Text('You have finished the game!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              setState(() {
+                correctAnswer = 0; // Reset jawaban benar
+                progress = 0.0; // Reset progress bar
+                _generateNewQuestion(); // Generate soal baru
+                _selectedBoxes.clear(); // Clear selected boxes
+              });
+            },
+            child: const Text('Play again'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
