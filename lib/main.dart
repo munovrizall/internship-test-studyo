@@ -24,6 +24,11 @@ class _MyAppState extends State<MyApp> {
   int _numerator = 1;
   int _denominator = 1;
 
+  int correctAnswer = 0; // Menyimpan jumlah jawaban benar
+  final int _targetCorrectAnswers =
+      5; // Target jawaban benar untuk progress penuh
+  double progress = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +37,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -80,92 +87,110 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         backgroundColor: const Color(0xff363636),
-        body: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+        body: Column(
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                sliderWidget(Orientation.vertical),
-                const SizedBox(
-                  height: 60,
-                ),
-              ],
+            SizedBox(
+              width: screenWidth,
+              child: LinearProgressIndicator(
+                value: progress, // Nilai progress bar
+                backgroundColor: Colors.grey[300],
+                color: Colors.green,
+                minHeight: 10,
+              ),
             ),
-            Column(
+            const SizedBox(
+              height: 48,
+            ),
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      '$_numerator',
-                      style: const TextStyle(color: Colors.white, fontSize: 36),
-                    ),
+                    sliderWidget(Orientation.vertical),
                     const SizedBox(
-                      height: 20,
-                      width: 40,
-                      child: Divider(
-                        color: Colors.white,
-                        thickness: 5,
-                      ),
-                    ),
-                    Text(
-                      '$_denominator',
-                      style: const TextStyle(color: Colors.white, fontSize: 36),
+                      height: 60,
                     ),
                   ],
                 ),
-                sliderWidget(Orientation.horizontal),
-                GestureDetector(
-                  onTapDown: (details) {
-                    _handleTap(details.localPosition);
-                  },
-                  child: CustomPaint(
-                    size: const Size(280, 280),
-                    painter: RectPainter(
-                      horizontalDivision: _horizontalDivision,
-                      verticalDivision: _verticalDivision,
-                      selectedBoxes: _selectedBoxes,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '$_numerator',
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 36),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                          width: 40,
+                          child: Divider(
+                            color: Colors.white,
+                            thickness: 5,
+                          ),
+                        ),
+                        Text(
+                          '$_denominator',
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 36),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-                sliderWidget(Orientation.horizontal),
-                const SizedBox(height: 20),
-                // Hiding this text, because the selectedbox state won't be updated if i remove this text
-                Opacity(
-                  opacity: 0,
-                  child: Text(
-                    'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-                SizedBox(
-                  width: 200,
-                  child: FilledButton(
-                    onPressed: _checkAnswer,
-                    style: const ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(
-                        Color.fromARGB(255, 44, 44, 44),
+                    sliderWidget(Orientation.horizontal),
+                    GestureDetector(
+                      onTapDown: (details) {
+                        _handleTap(details.localPosition);
+                      },
+                      child: CustomPaint(
+                        size: const Size(280, 280),
+                        painter: RectPainter(
+                          horizontalDivision: _horizontalDivision,
+                          verticalDivision: _verticalDivision,
+                          selectedBoxes: _selectedBoxes,
+                        ),
                       ),
                     ),
-                    child: const Icon(
-                      Icons.check,
-                      size: 32,
-                      color: Color.fromARGB(255, 16, 197, 43),
+                    sliderWidget(Orientation.horizontal),
+                    const SizedBox(height: 20),
+                    // Hiding this text, because the selectedbox state won't be updated if i remove this text
+                    Opacity(
+                      opacity: 0,
+                      child: Text(
+                        'Selected: ${_selectedBoxes.length} / ${(_horizontalDivision * _verticalDivision).toInt()}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ),
-                  ),
+                    SizedBox(
+                      width: 200,
+                      child: FilledButton(
+                        onPressed: _checkAnswer,
+                        style: const ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(
+                            Color.fromARGB(255, 44, 44, 44),
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.check,
+                          size: 32,
+                          color: Color.fromARGB(255, 16, 197, 43),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                sliderWidget(Orientation.vertical),
-                const SizedBox(
-                  height: 60,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    sliderWidget(Orientation.vertical),
+                    const SizedBox(
+                      height: 60,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -277,6 +302,8 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Colors.green,
           textColor: Colors.white,
           fontSize: 16.0);
+      correctAnswer++;
+      _updateProgress();
       _generateNewQuestion();
       _selectedBoxes.clear();
     } else {
@@ -291,6 +318,12 @@ class _MyAppState extends State<MyApp> {
       _generateNewQuestion();
       _selectedBoxes.clear();
     }
+  }
+
+  void _updateProgress() {
+    setState(() {
+      progress = correctAnswer / _targetCorrectAnswers;
+    });
   }
 }
 
